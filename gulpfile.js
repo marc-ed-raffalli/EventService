@@ -5,6 +5,7 @@ var coffee = require('gulp-coffee'),
     mocha = require('gulp-mocha'),
     rename = require("gulp-rename"),
     rimraf = require('gulp-rimraf'),
+    shell = require('gulp-shell'),
     uglify = require('gulp-uglify');
 
 
@@ -24,6 +25,15 @@ gulp.task('lint', function () {
     return gulp.src(bases.src + '*.js')
         .pipe(jshint())
         .pipe(jshint.reporter('default'));
+});
+
+gulp.task('doc', ['clean'], function () {
+    return gulp.src('')
+        .pipe(shell([
+            'rm -rf api',
+            'mkdir api',
+            'jsdox --output api src'
+        ]));
 });
 
 gulp.task('coffee-build-test', function () {
@@ -51,4 +61,4 @@ gulp.task('copy-src', ['clean'], function () {
         .pipe(gulp.dest(bases.dist));
 });
 
-gulp.task('default', ['clean', 'lint', 'copy-src', 'uglify']);// 'test',
+gulp.task('default', ['clean', 'lint', 'doc', 'copy-src', 'uglify']); // 'test',

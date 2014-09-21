@@ -3,6 +3,21 @@ define [
   'src/EventService'
 ], (EventService) ->
 
+  testEvtArr = []
+  evtName = 'evtName'
+  channel = 'channelA'
+  evtService = undefined
+
+  registerEvent = (evtArgs) ->
+    evt = evtService.on evtArgs
+    testEvtArr.push evt
+    return evt
+
+  cleanAllEvts = ->
+    testEvtArr.forEach (evt)->
+      evtService.off evt
+    testEvtArr = []
+
   # ------------------------------------------------------
   describe 'EventService', ->
     it 'EventService API should be defined', ->
@@ -17,71 +32,62 @@ define [
     # ------------------------------------------------------
     # ------------------------------------------------------
     describe 'EventService on()', ->
-      evtService = undefined
-      testEvtArr = []
-      evtName = 'evtName'
-      channel = 'channelA'
-
-      registerEvent = (evtArgs) ->
-        evtId = evtService.on evtArgs
-        testEvtArr.push
-          evtId: evtId,
-          channel: evtArgs.channel
-        return evtId
-
-      cleanAllEvts = ->
-        testEvtArr.forEach (evt)->
-          evtService.off evt
-
       beforeEach ->
         evtService = new EventService()
 
       afterEach ->
         cleanAllEvts()
-        testEvtArr = []
         evtService = undefined
 
       # -------------------------------------------------------
-      it 'should accept event name and callback', ->
+      it 'should accept minimum arguments / event name and callback', ->
         registerEvent
           evtName: evtName
           callBack: ->
             return
 
       # -------------------------------------------------------
-      it 'should accept event name, callback and priority', ->
+      it 'should accept full arguments / event name, callback, channel and priority', ->
         registerEvent
           evtName: evtName
+          channel: channel
           callBack: ->
           priority: 1
 
       # -------------------------------------------------------
-      it 'should return an event id {id}', ->
-        evtId = registerEvent
+      it 'should return an event object with event data', ->
+        cbk = ->
+        p = 1
+        evt = registerEvent
           evtName: evtName
-          callBack: ->
+          callBack: cbk
 
-        expect(evtId).to.be.a.string
-        expect(evtId).not.to.be.undefined
-        expect(Number.isNaN(evtId)).to.be.false
+        expect(evt).not.to.be.undefined
+        expect(evt).to.be.an('object')
 
-      # -------------------------------------------------------
-      it 'should return an event id channel:{id}', ->
-        evtId = registerEvent
+        expect(evt.evtName).to.equal evtName
+        expect(evt.callBack).to.equal cbk
+        # default values
+        expect(evt.priority).to.equal 0
+        expect(evt.channel).to.equal undefined
+
+        evt = registerEvent
           evtName: evtName
           channel: channel
-          callBack: ->
+          callBack: cbk
+          priority: p
 
-        split = evtId.split ':'
+        expect(evt).not.to.be.undefined
+        expect(evt).to.be.an('object')
 
-        expect(evtId).to.be.a.string
-        expect(split.length).to.equal 2
-        expect(split).to.contain channel
-        expect(Number.isNaN(split[1])).to.be.false
-
+        expect(evt.evtName).to.equal evtName
+        expect(evt.callBack).to.equal cbk
+        # custom values
+        expect(evt.priority).to.equal p
+        expect(evt.channel).to.equal channel
 
       # -------------------------------------------------------
-      it 'should throw if name is not string', ->
+      it 'should throw if evtName is not string', ->
         fn = ->
           evtService.on
             evtName: 1
@@ -104,40 +110,24 @@ define [
             priority: 1
         expect(fn).to.throw
 
-
     # -------------------------------------------------------
     # -------------------------------------------------------
     describe 'EventService off()', ->
-      evtService = undefined
-      testEvtIdArr = []
-      evtName = 'evtName'
-      channel = 'channelA'
-
-      registerEvent = (evtArgs) ->
-        evtId = evtService.on evtArgs
-        testEvtIdArr.push evtId
-        return evtId
-
-      cleanAllEvts = ->
-        testEvtIdArr.forEach (evtId)->
-          evtService.off evtId
-
       beforeEach ->
         evtService = new EventService()
 
       afterEach ->
         cleanAllEvts()
-        testEvtIdArr = []
         evtService = undefined
 
       # -------------------------------------------------------
-      it 'should accept evtId {string}, evtName {string}, channel {string}, prioritySelector {function}', ->
-        evtId = registerEvent
+      it 'should accept evt {Event} or evtName {string}, channel {string}, prioritySelector {function}', ->
+        evt = registerEvent
           evtName: evtName
           callBack: ->
 
         fn = ->
-          evtService.off evtId
+          evtService.off evt
 
         expect(fn).not.to.throw
 
@@ -149,18 +139,6 @@ define [
         expect(fn).not.to.throw
 
       # -------------------------------------------------------
-      it 'should not throw if evtId not found', ->
-        fn = ->
-          evtService.off 'fooBarId'
-        expect(fn).not.to.throw
-
-      # -------------------------------------------------------
-      it 'should throw if evtId is not string', ->
-        fn = ->
-          evtService.off 2
-        expect(fn).to.throw
-
-      # -------------------------------------------------------
       it 'should remove event from default channel', ->
         ctr = 0
         params =
@@ -169,7 +147,7 @@ define [
             ctr++
 
         registerEvent params
-        evt2Id = registerEvent params
+        evt2 = registerEvent params
         registerEvent params
 
         evtService.trigger
@@ -178,7 +156,7 @@ define [
         expect(ctr).to.equal 3
 
         ctr = 0
-        evtService.off evt2Id
+        evtService.off evt2
 
         evtService.trigger
           evtName: evtName
@@ -264,7 +242,7 @@ define [
             ctr++
 
         registerEvent params
-        evt2Id = registerEvent params
+        evt2 = registerEvent params
         registerEvent params
 
         evtService.trigger
@@ -274,7 +252,7 @@ define [
         expect(ctr).to.equal 3
 
         ctr = 0
-        evtService.off evt2Id
+        evtService.off evt2
 
         evtService.trigger
           evtName: evtName
@@ -359,26 +337,11 @@ define [
     # -------------------------------------------------------
     # -------------------------------------------------------
     describe 'EventService trigger()', ->
-      evtService = undefined
-      testEvtIdArr = []
-      evtName = 'evtName'
-      channel = 'channelA'
-
-      registerEvent = (evtArgs) ->
-        evtId = evtService.on evtArgs
-        testEvtIdArr.push evtId
-        return evtId
-
-      cleanAllEvts = ->
-        testEvtIdArr.forEach (evtId)->
-          evtService.off evtId
-
       beforeEach ->
         evtService = new EventService()
 
       afterEach ->
         cleanAllEvts()
-        testEvtIdArr = []
         evtService = undefined
 
       # -------------------------------------------------------
@@ -447,6 +410,50 @@ define [
           callBack: ->
             expect(ctr).to.equal 11
             done()
+
+        expect(ctr).to.equal 0
+
+        evtService.trigger
+          evtName: evtName
+
+      # -------------------------------------------------------
+      it 'should have up to date priority order when event priority is updated', (done) ->
+        ctr = 0
+
+        # first event to trigger
+        registerEvent
+          evtName: evtName
+          callBack: ->
+            evt2.incrementPriority 3
+            expect(ctr).to.equal 0
+            ctr++
+
+        # updated to priority 4
+        # last
+        evt2 = registerEvent
+          evtName: evtName
+          priority: 1
+          callBack: ->
+            expect(ctr).to.equal 111
+            done()
+
+        # second
+        registerEvent
+          evtName: evtName
+          priority: 2
+          callBack: ->
+            evt3.decrementPriority 2
+            expect(ctr).to.equal 1
+            ctr += 10
+
+        # updated to priority 3
+        # third
+        evt3 = registerEvent
+          evtName: evtName
+          priority: 5
+          callBack: ->
+            expect(ctr).to.equal 11
+            ctr += 100
 
         expect(ctr).to.equal 0
 
@@ -557,5 +564,294 @@ define [
 
         expect(ctr).to.equal 3
 
-#------------------------------------------------------------
-#------------------------------------------------------------
+      # -------------------------------------------------------
+      it 'should not trigger if the event is paused', ->
+        ctr = 0
+        params =
+          evtName: evtName
+          callBack: ->
+            ctr++
+
+        registerEvent params
+        evt2 = registerEvent params
+        registerEvent params
+
+        evt2.pause()
+
+        evtService.trigger
+          evtName: evtName
+
+        expect(ctr).to.equal 2
+
+      # -------------------------------------------------------
+      it 'should trigger if the event is resumed', ->
+        ctr = 0
+        params =
+          evtName: evtName
+          callBack: ->
+            ctr++
+
+        registerEvent params
+        evt2 = registerEvent params
+        registerEvent params
+
+        evt2.pause()
+
+        evtService.trigger
+          evtName: evtName
+
+        expect(ctr).to.equal 2
+
+        ctr = 0
+        evt2.resume()
+
+        evtService.trigger
+          evtName: evtName
+
+        expect(ctr).to.equal 3
+
+      # -------------------------------------------------------
+      it 'should not trigger if the event is stopped', ->
+        ctr = 0
+        params =
+          evtName: evtName
+          callBack: ->
+            ctr++
+
+        registerEvent params
+        evt2 = registerEvent params
+        registerEvent params
+
+        evt2.stop()
+
+        evtService.trigger
+          evtName: evtName
+
+        expect(ctr).to.equal 2
+
+  #------------------------------------------------------------
+  #------------------------------------------------------------
+
+  describe 'Event', ->
+    beforeEach ->
+      evtService = new EventService()
+
+    afterEach ->
+      cleanAllEvts()
+      evtService = undefined
+
+    # -------------------------------------------------------
+    it 'Event API should be defined', ->
+      evt = registerEvent
+        evtName: evtName
+        callBack: ->
+          throw new Error 'should not be called'
+
+      expect(evt.incrementPriority).not.to.be.undefined
+      expect(evt.decrementPriority).not.to.be.undefined
+
+      expect(evt.trigger).not.to.be.undefined
+
+      expect(evt.isPaused).not.to.be.undefined
+      expect(evt.pause).not.to.be.undefined
+      expect(evt.resume).not.to.be.undefined
+
+      expect(evt.stop).not.to.be.undefined
+      expect(evt.isStopped).not.to.be.undefined
+
+    # -------------------------------------------------------
+    # -------------------------------------------------------
+    describe 'Event incrementPriority()', ->
+      beforeEach ->
+        evtService = new EventService()
+
+      afterEach ->
+        cleanAllEvts()
+        evtService = undefined
+
+      # -------------------------------------------------------
+      it 'should increment priority value by one if no value provided', ->
+        p = 1
+        evt = registerEvent
+          evtName: evtName
+          callBack: ->
+            throw new Error 'should not be called'
+          priority: p
+
+        expect(evt.priority).to.equal p
+
+        evt.incrementPriority()
+
+        expect(evt.priority).to.equal (p + 1)
+
+      # -------------------------------------------------------
+      it 'should increment priority value by the value provided', ->
+        p = 1
+        step = 5
+        evt = registerEvent
+          evtName: evtName
+          callBack: ->
+            throw new Error 'should not be called'
+          priority: p
+
+        expect(evt.priority).to.equal p
+
+        evt.incrementPriority(step)
+
+        expect(evt.priority).to.equal (p + step)
+
+      # -------------------------------------------------------
+      it 'should throw if event stopped', ->
+        evt = registerEvent
+          evtName: evtName
+          callBack: ->
+            throw new Error 'should not be called'
+
+        evt.stop()
+
+        expect(->
+          evt.incrementPriority()).to.throw
+
+        expect(->
+          evt.incrementPriority(5)).to.throw
+
+    # -------------------------------------------------------
+    # -------------------------------------------------------
+    describe 'Event decrementPriority()', ->
+      beforeEach ->
+        evtService = new EventService()
+
+      afterEach ->
+        cleanAllEvts()
+        evtService = undefined
+
+      # -------------------------------------------------------
+      it 'should decrement priority value by one if no value provided', ->
+        p = 1
+        evt = registerEvent
+          evtName: evtName
+          callBack: ->
+            throw new Error 'should not be called'
+          priority: p
+
+        expect(evt.priority).to.equal p
+
+        evt.decrementPriority()
+
+        expect(evt.priority).to.equal (p - 1)
+
+      # -------------------------------------------------------
+      it 'should decrement priority value by the value provided', ->
+        p = 1
+        step = 5
+        evt = registerEvent
+          evtName: evtName
+          callBack: ->
+            throw new Error 'should not be called'
+          priority: p
+
+        expect(evt.priority).to.equal p
+
+        evt.decrementPriority(step)
+
+        expect(evt.priority).to.equal (p - step)
+
+      # -------------------------------------------------------
+      it 'should throw if event stopped', ->
+        evt = registerEvent
+          evtName: evtName
+          callBack: ->
+            throw new Error 'should not be called'
+
+        evt.stop()
+
+        expect(->
+          evt.decrementPriority()).to.throw
+
+        expect(->
+          evt.decrementPriority(5)).to.throw
+
+    # -------------------------------------------------------
+    # -------------------------------------------------------
+    describe 'Event trigger()', ->
+      beforeEach ->
+        evtService = new EventService()
+
+      afterEach ->
+        cleanAllEvts()
+        evtService = undefined
+
+      # -------------------------------------------------------
+      it 'should trigger callback', (done) ->
+        evt = registerEvent
+          evtName: evtName
+          callBack: ->
+            done()
+
+        evt.trigger()
+
+      # -------------------------------------------------------
+      it 'should not trigger callback when paused', ->
+        evt = registerEvent
+          evtName: evtName
+          callBack: ->
+            throw new Error 'should not be called'
+
+        evt.pause()
+        evt.trigger()
+
+      # -------------------------------------------------------
+      it 'should throw if event stopped', ->
+        evt = registerEvent
+          evtName: evtName
+          callBack: ->
+            throw new Error 'should not be called'
+        evt.stop()
+        expect(->
+          evt.trigger()).to.throw
+
+    # -------------------------------------------------------
+    # -------------------------------------------------------
+    describe 'Event flow isPaused() / pause() / resume()', ->
+      beforeEach ->
+        evtService = new EventService()
+
+      afterEach ->
+        cleanAllEvts()
+        evtService = undefined
+
+      # -------------------------------------------------------
+      it 'event should be paused = false by default', ->
+        evt = registerEvent
+          evtName: evtName
+          callBack: ->
+            throw new Error 'should not be called'
+
+        expect(evt.isPaused()).to.be.false
+
+      # -------------------------------------------------------
+      it 'pause / resume should change pause status', ->
+        evt = registerEvent
+          evtName: evtName
+          callBack: ->
+            throw new Error 'should not be called'
+
+        expect(evt.isPaused()).to.be.false
+        evt.pause()
+        expect(evt.isPaused()).to.be.true
+        evt.resume()
+        expect(evt.isPaused()).to.be.false
+
+      # -------------------------------------------------------
+      it 'pause / resume should throw if event is stopped', ->
+        evt = registerEvent
+          evtName: evtName
+          callBack: ->
+            throw new Error 'should not be called'
+        evt.stop()
+        expect(->
+          evt.pause()).to.throw
+        expect(->
+          evt.resume()).to.throw
+        expect(->
+          evt.isPaused()).not.to.throw
