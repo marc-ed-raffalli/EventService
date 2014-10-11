@@ -2,6 +2,7 @@ EventService
 ============
 
 [![Build Status](https://travis-ci.org/chi-mai2b/EventService.svg?branch=master)](https://travis-ci.org/chi-mai2b/EventService)
+[![Coverage Status](https://coveralls.io/repos/chi-mai2b/EventService/badge.png)](https://coveralls.io/r/chi-mai2b/EventService)
 
 The EventService is a lightweight implementation of the "Observer" pattern. 
 Implemented without any dependency.

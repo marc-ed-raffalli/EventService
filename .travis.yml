@@ -11,3 +11,6 @@ before_install:
 
 script:
   - gulp
+
+after_script:
+  - cat dist/coverage/lcov.info | codeclimate
