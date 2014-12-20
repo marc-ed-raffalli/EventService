@@ -223,7 +223,7 @@ var
      *
      * @param {RegistryItem|object} options. The item returned by register or an object describing criteria:<br>
      *  - channel: (optional) {string},                                     <br/>
-     *  - name: {string} name of the item(s) to remove,                       <br/>
+     *  - name: {string} name of the item(s) to remove,                     <br/>
      *  - selector: {function} It provides the items belonging to the channel, and name if specified; in a one by one basis to allow fine selection.
      *
      *  @return {array} Items removed from the Registry
@@ -240,7 +240,7 @@ var
      * Selects and returns item(s) from the specified channel based on the criteria and selector passed in parameters.<br>
      * If the channel is not provided, the default channel is used.
      *
-     * @param {object} options.            <br>
+     * @param {object} options.                         <br/>
      *  - channel: (optional) {string},                 <br/>
      *  - name: {string} name of the item(s) to remove, <br/>
      *  - selector: {function} It provides the items belonging to the channel, and name if specified; in a one by one basis to allow fine selection.

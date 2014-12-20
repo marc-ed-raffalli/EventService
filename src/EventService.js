@@ -5,11 +5,12 @@
 //------------------------------------------------------------------------------------
 /**
  * The EventService implements the observer pattern.
- * Each event registered in the Event Registry has a name, callback, priority and channel.
+ * Each event registered in the Event Registry has a name, callback, data, priority and channel.
  * It can later be triggered or removed based on these same criteria.
  *
  * - **name** is the way to identify one event from another.
  * - **callBack** is the action to perform.
+ * - **data** is the additional information related to the event.
  * - **priority** allows to rank the events in the order you want prior execution or as a criteria for removal.
  * - **channel** allows for clusterization of the events.
  * Events in a separate channel won't be affected by any trigger/removal occurring in a different channel.
@@ -28,7 +29,7 @@ var
 //------------------------------------------
     eventPrioritySort = function (a, b) {
         // sort by priority descending order
-        return b.priority - a.priority;
+        return b.getPriority() - a.getPriority();
     },
 //------------------------------------------
     /**
@@ -43,13 +44,15 @@ var
      *  - name: {string} name of the event,                                 <br/>
      *  - callBack: {function} function to execute when event is triggered, <br/>
      *  - channel: (optional) {string},                                     <br/>
+     *  - context: (optional) {any},                                        <br/>
+     *  - data:    (optional) {any},                                        <br/>
      *  - priority: (optional) {number}
      *
      * @param  {object} [context] Context to execute the callback on.
      * @return {Event} event
      *
      * @example
-     *   var evtService = new EventService(),
+     *   var evtService = new EventService();
      *   var evt = evtService.on({
      *     name: 'eventNameFoo',
      *     callBack: function(){  // Do stuff },
@@ -93,13 +96,14 @@ var
             name: options.name,
             channel: options.channel,
             priority: options.priority,
+            data: options.data,
             callBack: options.callBack,
             context: options.context
         });
 
         event._onStop = this.off.bind(this, event);
 
-        return  event;
+        return event;
     },
 //------------------------------------------
     /**
@@ -128,7 +132,7 @@ var
      *   evtService.off({
      *     channel: 'channelFoo',
      *     selector: function(e){ // will provide only events from the channel 'channelFoo'.
-     *       return (e.name === 'fooA' || e.name === 'fooB') && e.priority < 10;
+     *       return (e.getName() === 'fooA' || e.getName() === 'fooB') && e.getPriority() < 10;
      *     }
      *   });
      *   // will clear all events named 'fooA' or 'fooB' in the channel 'channelFoo' with a priority lower than 10.
@@ -164,8 +168,8 @@ var
      *
      *   var options = {
      *     channel: 'channelFoo',
-     *     selector: function(event){
-     *       return e.priority > 10 && name ==='nameFoo';
+     *     selector: function(e){
+     *       return e.getPriority() > 10 && e.getName() === 'nameFoo';
      *     }
      *   };
      *   evtService.trigger(options, 'foo', 'bar', 123);

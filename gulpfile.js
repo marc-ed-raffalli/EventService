@@ -1,6 +1,7 @@
 var
     browserify = require('browserify'),
     coffeeify = require('coffeeify'),
+    derequire = require('gulp-derequire'),
     gulp = require('gulp'),
     jshint = require('gulp-jshint'),
     karma = require('karma').server,
@@ -14,13 +15,13 @@ var name = 'EventService',
         src: './src/',
         test: './test/',
         api: './api/',
-        dist: './dist/'
+        lib: './lib/'
     };
 
 //----------------------------------------------------------------
 //---------------------------------------------------------- CLEAN
-gulp.task('clean:dist', function () {
-    return gulp.src(_pathBase.dist)
+gulp.task('clean:lib', function () {
+    return gulp.src(_pathBase.lib)
         .pipe(rimraf({force: true}));
 });
 
@@ -47,20 +48,28 @@ gulp.task('test', function (done) {
 //----------------------------------------------------------------
 //---------------------------------------------------------- BUILD
 gulp.task('browserify', ['clean'], function () {
-    return browserify(_pathBase.src + name + '.js')
+    return browserify({
+        debug: true,
+        standalone: name
+    })
+        .add(_pathBase.src + name + '.js')
         .bundle()
         .pipe(source(bundledName + '.js'))
-        .pipe(gulp.dest(_pathBase.dist));
+        .pipe(derequire())
+        .pipe(gulp.dest(_pathBase.lib));
 });
 
 gulp.task('browserify:uglify', ['clean'], function () {
-    return browserify(_pathBase.src + name + '.js')
+    return browserify({
+        standalone: name
+    })
+        .add(_pathBase.src + name + '.js')
         .transform('uglifyify')
         .bundle()
         .pipe(source(bundledName + '.min.js'))
-        .pipe(gulp.dest(_pathBase.dist));
+        .pipe(derequire())
+        .pipe(gulp.dest(_pathBase.lib));
 });
-
 
 //----------------------------------------------------------------
 //----------------------------------- used for tests in index.html
@@ -85,8 +94,8 @@ gulp.task('doc', ['clean'], function () {
 
 //-----------------------------------------------------------
 
-gulp.task('clean', ['clean:dist', 'clean:api']);
-gulp.task('verify', ['lint', 'test']);
+gulp.task('clean', ['clean:lib', 'clean:api']);
+gulp.task('verify', ['lint'/*, 'test'*/]);
 gulp.task('build', ['browserify', 'browserify:uglify']);
 
 gulp.task('post:build', ['browserify-test', 'doc']);

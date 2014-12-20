@@ -30,7 +30,7 @@ Removes item(s) from the specified channel based on the criteria and selector pa
 
 **Parameters**
 
-**options.**: `RegistryItem | object`, The item returned by register or an object describing criteria:<br> - channel: (optional) {string},                                     <br/> - name: {string} name of the item(s) to remove,                       <br/> - selector: {function} It provides the items belonging to the channel, and name if specified; in a one by one basis to allow fine selection.
+**options.**: `RegistryItem | object`, The item returned by register or an object describing criteria:<br> - channel: (optional) {string},                                     <br/> - name: {string} name of the item(s) to remove,                     <br/> - selector: {function} It provides the items belonging to the channel, and name if specified; in a one by one basis to allow fine selection.
 
 **Returns**: `array`, Items removed from the Registry
 
@@ -40,7 +40,7 @@ Selects and returns item(s) from the specified channel based on the criteria and
 
 **Parameters**
 
-**options.**: `object`, <br> - channel: (optional) {string},                 <br/> - name: {string} name of the item(s) to remove, <br/> - selector: {function} It provides the items belonging to the channel, and name if specified; in a one by one basis to allow fine selection.
+**options.**: `object`, <br/> - channel: (optional) {string},                 <br/> - name: {string} name of the item(s) to remove, <br/> - selector: {function} It provides the items belonging to the channel, and name if specified; in a one by one basis to allow fine selection.
 
 
 

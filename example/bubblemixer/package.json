@@ -1,0 +1,19 @@
+{
+  "name": "bubble-mixer",
+  "version": "0.1.0",
+  "description": "Getting started with Event Service",
+  "author": "Marc Ed Raffalli",
+  "homepage": "http://marc-ed-raffalli.com/blog/",
+  "repository": "https://github.com/chi-mai2b/EventService",
+  "engines": {
+    "node": ">=0.10.26"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "jquery-browserify": "^1.8.1",
+    "jquery": "^2.1.3",
+    "node-lessify": "0.0.8",
+    "eventservice": "^0.3.0",
+    "handlebars": "^1.3.0"
+  }
+}

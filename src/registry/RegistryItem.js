@@ -11,12 +11,11 @@
 //------------------------------------------------------------------------------------
 
 var
-    extendsFactory = require('../utils/extendsFactory.js');
+    extendsFactory = require('../utils/extendsFactory.js'),
 
 //------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------
 
-var
     /**
      * @description
      * Initializes the RegistryItem properties.

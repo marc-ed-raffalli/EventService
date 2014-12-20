@@ -33,6 +33,12 @@ Returns the event context
 
 **Returns**: `any`
 
+### Event.getData() 
+
+Returns the event specific data
+
+**Returns**: `any`
+
 ### Event.getName() 
 
 Returns the event name

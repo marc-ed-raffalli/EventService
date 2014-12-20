@@ -1,0 +1,30 @@
+.mr-es-BubblePanel {
+    position: relative;
+    margin: 10px 0;
+    border: 1px #cccccc solid;
+    border-radius: 4px;
+    background-color: #eeeeee;
+
+    &-forms {
+        margin: 10px 0;
+        font-size: 0;
+    }
+
+    &-listHolder,
+    &-configHolder {
+        display: inline-block;
+        vertical-align: top;
+        height: 100%;
+        width: calc(~'50% - 10px');
+        font-size: 1.2rem;
+        box-sizing: border-box;
+        margin-right: 10px;
+    }
+
+    &-listHolder {
+        min-height: 30px;
+    }
+    &-actions {
+        padding: 6px 10px;
+    }
+}

@@ -1,11 +1,18 @@
 {
-  "name": "EventService",
+  "name": "eventservice",
   "version": "0.3.0",
   "author": "Marc Ed Raffalli",
   "homepage": "http://marc-ed-raffalli.com/blog/",
-  "repository": "https://github.com/chi-mai2b/EventService",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chi-mai2b/EventService"
+  },
+  "main": "index.js",
   "engines": {
     "node": ">=0.10.26"
+  },
+  "scripts": {
+    "test": "echo \"Error: npm test not supported, see README \" && exit 1"
   },
   "devDependencies": {
     "chai": "^1.9.2",
@@ -29,6 +36,9 @@
     "karma-browserify": "^1.0.1",
     "karma-coffee-preprocessor": "^0.2.1",
     "karma-phantomjs-launcher": "^0.1.4",
-    "karma-es5-shim": "https://github.com/pokehanai/karma-es5-shim/archive/v2.1.0.tar.gz"
+    "karma-es5-shim": "https://github.com/pokehanai/karma-es5-shim/archive/v2.1.0.tar.gz",
+    "derequire": "^1.2.0",
+    "gulp-derequire": "^2.0.0",
+    "hbsfy": "^2.2.1"
   }
 }

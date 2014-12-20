@@ -1,0 +1,9 @@
+.idea/
+test/
+script/
+example/
+
+*.iml
+.travis.yml
+gulpfile.js
+karma.conf.js

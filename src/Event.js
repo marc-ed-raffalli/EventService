@@ -38,6 +38,8 @@ var
      *  - name: {string} name of the event,                                 <br/>
      *  - callBack: {function} function to execute when event is triggered, <br/>
      *  - channel: (optional) {string},                                     <br/>
+     *  - context: (optional) {any},                                        <br/>
+     *  - data:    (optional) {any},                                        <br/>
      *  - priority: (optional) {number}
      *
      * @throws TypeError
@@ -66,6 +68,10 @@ var
             // read only
             context: {
                 value: options.context
+            },
+            // read only
+            data: {
+                value: options.data
             },
             // priority is writable, can be changed through the API
             paused: {
@@ -129,6 +135,19 @@ var
      */
     _getContext = function () {
         return this.context;
+    },
+//-----------------------------
+    /**
+     * @method getData
+     * @for Event
+     *
+     * @description
+     * Returns the event specific data
+     *
+     * @return {any}
+     */
+    _getData = function () {
+        return this.data;
     },
 //-----------------------------
     /**
@@ -296,6 +315,7 @@ var Event = RegistryItem.prototype.extends({
     getCallback: _getCallback,
     getChannel: _getChannel,
     getContext: _getContext,
+    getData: _getData,
     getName: _getName,
     getPriority: _getPriority,
     incrementPriority: _incrementPriority,

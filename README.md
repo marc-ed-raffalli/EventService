@@ -22,8 +22,10 @@ Implemented without any dependency.
 
 ## API & Examples
 
-[EventService API and examples](./api/EventService.md)
+[EventService API and examples](./api/EventService.md)  
 [Event API and examples](./api/Event.md)
+
+See [example application](./example/bubblemixer/index.html)
 
 ## Utils
 
@@ -50,6 +52,12 @@ You need to compile the tests before run.
 * PhantomJS
 * Chrome 39
 * Firefox 31
+
+## Revision history
+
+- added property "data" in class Event
+- added example bubblemixer
+- moved built source to lib
 
 ## TODO
 
