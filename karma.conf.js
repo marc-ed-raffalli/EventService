@@ -5,20 +5,16 @@ module.exports = function (config) {
     'use strict';
 
     var
-        testFilePattern = 'test/**/*.coffee',
+        testFilePattern = 'test/main.coffee',
         preprocessors = {},
         reporters = ['progress'],
-        exclude = [
-            'test/main.coffee'
-        ];
+        exclude = [];
 
     preprocessors[testFilePattern] = ['browserify'];
 
-//    reporters.push('coverage');
-
     config.set({
         basePath: '',
-        frameworks: ['browserify', 'mocha', 'chai-sinon'],
+        frameworks: ['browserify', 'mocha', 'chai-sinon', 'es5-shim'],
 
         files: [
             testFilePattern
@@ -30,38 +26,19 @@ module.exports = function (config) {
 
         reporters: reporters,
 
-        coffeePreprocessor: {
-            options: {
-                bare: true,
-                sourceMap: false
-            },
-            transformPath: function (path) {
-                return path.replace(/\.coffee$/, '.js');
-            }
-        },
-        coverageReporter: {
-            reporters: [
-                {type: 'html', dir: 'dist/coverage/', subdir: 'report'},
-                {type: 'lcovonly', dir: 'dist/coverage/', subdir: '.'}
-            ]
-        },
         browserify: {
             debug: true,
-            outfile:'test/EventService.bundle.test.js',
-            extensions: ['.js', '.coffee'],
-            transform: ['coffeeify', 'brfs', 'browserify-shim']
+            extensions: ['.coffee'],
+            transform: ['coffeeify']
         },
 
+        browsers: ['PhantomJS'],
+
+
         port: 9876,
-
         colors: true,
-
         logLevel: config.LOG_INFO,
-
         autoWatch: true,
-
-        browsers: ['Chrome'],//, 'Chrome', 'Firefox'],
-
         singleRun: false
     });
 };

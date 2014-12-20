@@ -4,11 +4,7 @@ node_js:
 
 before_install:
   - npm install -g gulp
-  - npm install -g istanbul
   - npm install -g mocha
 
 script:
   - gulp
-
-after_script:
-  - istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage
