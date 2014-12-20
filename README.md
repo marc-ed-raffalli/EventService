@@ -22,7 +22,7 @@ Implemented without any dependency.
 
 ## API & Examples
 
-[EventService API and examples](./api/EventService.md)
+[EventService API and examples](./api/EventService.md)  
 [Event API and examples](./api/Event.md)
 
 ## Utils
