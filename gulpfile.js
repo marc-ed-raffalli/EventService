@@ -1,26 +1,37 @@
-var browserify = require('gulp-browserify'),
+var
+    browserify = require('browserify'),
+    coffeeify = require('coffeeify'),
     gulp = require('gulp'),
     jshint = require('gulp-jshint'),
     karma = require('karma').server,
-    rename = require("gulp-rename"),
     rimraf = require('gulp-rimraf'),
     shell = require('gulp-shell'),
-    uglify = require('gulp-uglify');
+    source = require('vinyl-source-stream');
 
-var bases = {
-    src: 'src/',
-    test: 'test/',
-    dist: 'dist/'
-};
+var bundledName = 'EventService.bundle',
+    bases = {
+        src: './src/',
+        test: 'test/',
+        api: './api/',
+        dist: './dist/'
+    };
 
-// Delete the dist directory
-gulp.task('clean', function () {
+//----------------------------------------------------------------
+//---------------------------------------------------------- CLEAN
+gulp.task('clean:dist', function () {
     return gulp.src(bases.dist)
-        .pipe(rimraf());
+        .pipe(rimraf({force: true}));
 });
 
+gulp.task('clean:api', function () {
+    return gulp.src(bases.api)
+        .pipe(rimraf({force: true}));
+});
+
+//-----------------------------------------------------------------
+//---------------------------------------------------------- VERIFY
 gulp.task('lint', function () {
-    return gulp.src(bases.src + '*.js')
+    return gulp.src(bases.src + '**/*.js')
         .pipe(jshint())
         .pipe(jshint.reporter('default'));
 });
@@ -32,43 +43,40 @@ gulp.task('test', function (done) {
     }, done);
 });
 
-gulp.task('uglify', function () {
-    return gulp.src(bases.dist + 'EventService.bundle.js')
-        .pipe(uglify())
-        .pipe(rename('EventService.bundle.min.js'))
+//----------------------------------------------------------------
+//---------------------------------------------------------- BUILD
+gulp.task('browserify', ['clean'], function () {
+    return browserify(bases.src + 'EventService.js')
+        .bundle()
+        .pipe(source(bundledName + '.js'))
         .pipe(gulp.dest(bases.dist));
 });
 
-gulp.task('copy-src', ['clean', 'browserify', 'uglify'], function () {
-    return gulp.src(bases.src + '*.js')
+gulp.task('browserify:uglify', ['clean'], function () {
+    return browserify(bases.src + 'EventService.js')
+        .transform('uglifyify')
+        .bundle()
+        .pipe(source(bundledName + '.min.js'))
         .pipe(gulp.dest(bases.dist));
 });
 
+//--------------------------------------------------------------
+//---------------------------------------------------------- DOC
 gulp.task('doc', ['clean'], function () {
     return gulp.src('')
         .pipe(shell([
-            'rm -rf api',
-            'mkdir api',
-            'jsdox --output api src'
+            'jsdox --output api src',
+            'jsdox --output api src/registry'
         ]));
 });
 
-gulp.task('browserify', function () {
-    gulp.src([bases.src + '*.js'], {read: false})
-        .pipe(browserify())
-        .pipe(rename('EventService.bundle.js'))
-        .pipe(gulp.dest(bases.dist));
-});
+//-----------------------------------------------------------
 
-gulp.task('browserify-test', function () {
-    gulp.src([bases.test + '*.coffee'], {read: false})
-        .pipe(browserify({
-            debug: true,
-            transform: ['coffeeify'],
-            extensions: ['.coffee']}))
-        .pipe(rename('EventService.test.bundle.js'))
-        .pipe(gulp.dest(bases.dist));
-});
+gulp.task('clean', ['clean:dist', 'clean:api']);
+gulp.task('verify', ['lint', 'test']);
+gulp.task('build', ['browserify', 'browserify:uglify']);
 
-gulp.task('default', ['clean', 'lint', 'test', 'copy-src', 'doc']);
+gulp.task('post:build', ['doc']);
+
+gulp.task('default', ['clean', 'build', 'verify', 'post:build']);
 

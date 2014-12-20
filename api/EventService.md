@@ -1,99 +1,66 @@
-Global
-===
+# Global
 
 
 
 
 
----
+* * *
 
-Event
-===
+## Class: EventService
+The EventService implements the observer pattern.Each event registered in the Event Registry has a name, callback, priority and channel.It can later be triggered or removed based on these same criteria.- **name** is the way to identify one event from another.- **callBack** is the action to perform.- **priority** allows to rank the events in the order you want prior execution or as a criteria for removal.- **channel** allows for clusterization of the events.Events in a separate channel won't be affected by any trigger/removal occurring in a different channel.It extends the class Registry that abstract most of the event storage and management.
 
+### EventService.on(options, context) 
 
-Event.incrementPriority(step) 
------------------------------
-Increment the original priority by 1 (default) or number provided.Throw Error if the event has been stopped before.
+Subscribe to the event identified by "name", to be executed with the given priority or default (1) on the given channel.If the channel is not provided/undefined, the default channel is used.Returns an object Event allowing for (priority change, pause/resume/stop) see Event API.
 
 **Parameters**
 
-**step**: number, (optional) Value to increment the priority by
+**options**: `object`, <br/> - name: {string} name of the event,                                 <br/> - callBack: {function} function to execute when event is triggered, <br/> - channel: (optional) {string},                                     <br/> - priority: (optional) {number}
 
-Event.decrementPriority(step) 
------------------------------
-Decrement the original priority by 1 (default) or number provided.Throw Error if the event has been stopped before.
+**context**: `object`, Context to execute the callback on.
 
-**Parameters**
+**Returns**: `Event`, event
 
-**step**: number, (optional) Value to decrement the priority by
+**Example**:
+```js
+var evtService = new EventService(),var evt = evtService.on({  name: 'eventNameFoo',  callBack: function(){  // Do stuff },  channel: 'channelFoo', // Optional  priority: 1            // Optional default is 1});// Register event named 'eventNameFoo' on the channel 'channelFoo' with a priority of 1
+```
 
-Event.trigger(args) 
------------------------------
-Call the event callback providing the arguments.Throw Error if the event has been stopped before.
+### EventService.off(options.) 
 
-**Parameters**
-
-**args**: Array, arguments applied to the callback
-
-Event.isPaused() 
------------------------------
-Give the 'paused' status of the event.
-
-**Returns**: boolean, 
-Event.pause() 
------------------------------
-Prevent the event callback to be called.Throw Error if the event has been stopped before.
-
-Event.resume() 
------------------------------
-Allow the event callback to be called again by the Event Service.Throw Error if the event has been stopped before.
-
-Event.stop() 
------------------------------
-Prevent the event callback to be called by removing it from the Event Service.
-
-Event.isStopped() 
------------------------------
-Give the 'stopped' status of the event.
-
-**Returns**: boolean, 
-
-EventService
-===
-
-
-EventService.on(options, context) 
------------------------------
-Subscribe to the event identified by "evtName" on the specified channel,If the channel is not provided, the default channel is used.<br>The priority allows the events to be executed in a certain order. It also allows to select by priority event to execute.<br>Returns the event object.
+Un-subscribe one / many event(s) from the service within the same channel based on the selector passed in parameters.<br>If the channel is not provided, the default channel is used.
 
 **Parameters**
 
-**options**: object, evtName: string,<br> callBack: function,<br> channel: (optional) string,<br> priority: (optional) number,
+**options.**: `Event | object`, The event returned or an object describing criteria:<br> - channel: (optional) {string},                                     <br/> - name: {string} name of the event to remove,                       <br/> - selector: {function} It provides the events belonging to the channel, and name if specified; in a one by one basis to allow fine selection.
 
-**context**: object, Subscribe to the event identified by "evtName" on the specified channel,If the channel is not provided, the default channel is used.<br>The priority allows the events to be executed in a certain order. It also allows to select by priority event to execute.<br>Returns the event object.
 
-**Returns**: Event, event
-EventService.off(options) 
------------------------------
-Un-subscribe one / many event(s) from the service.The off functions allows for filtering and can un-subscribe many events based on the filters passed in parameters.<br>If the channel is not provided, the default channel is used.
+**Example**:
+```js
+evtService.off(evt);// will remove only the event evtevtService.off({  name: 'nameFoo',  channel: 'channelFoo'});// will remove all events named 'nameFoo' in the channel 'channelFoo'evtService.off({  channel: 'channelFoo',  selector: function(e){ // will provide only events from the channel 'channelFoo'.    return (e.name === 'fooA' || e.name === 'fooB') && e.priority < 10;  }});// will clear all events named 'fooA' or 'fooB' in the channel 'channelFoo' with a priority lower than 10.
+```
 
-**Parameters**
+### EventService.trigger(options, arguments) 
 
-**options**: string, Event or object. The event returned by on or an object describing selectors:<br> evtName:  (optional),<br> channel: {string} (optional),<br> prioritySelector: {function} (optional)
-
-EventService.trigger(options, [args]*) 
------------------------------
 Trigger events based on the event name or an object describing selectors.<br>If the channel is not provided, the default channel is used.
 
 **Parameters**
 
-**options**: string, object / string The event name or an object describing selectors<br> evtName:  (optional),<br> channel: {string} (optional),<br> prioritySelector: {function} (optional), // filters event by priority
+**options**: `object`, object describing criteria:<br/> - channel: (optional) {string},                   <br/> - name: {string} name of the event to trigger,    <br/> - selector: {function} It provides the events belonging to the channel, and name if specified; in a one by one basis to allow fine selection.
 
-**[args]***: any, parameters of the triggered callback
+**arguments**: `any`, parameters of the triggered callback
+
+
+**Example**:
+```js
+evtService.trigger({  name: 'nameFoo'}, 'foo', 'bar', 123);// triggers all events named 'nameFoo' on default channel passing arguments 'foo', 'bar', 123var options = {  channel: 'channelFoo',  selector: function(event){    return e.priority > 10 && name ==='nameFoo';  }};evtService.trigger(options, 'foo', 'bar', 123);// triggers all events on channel 'channelFoo' with a priority greater than 10 and named 'nameFoo'// passing arguments 'foo', 'bar', 123
+```
 
 
 
----
+* * *
+
+
 
 
 

@@ -2,15 +2,13 @@ language: node_js
 node_js:
   - '0.10'
 
-branches:
-  only:
-    - master
-
 before_install:
   - npm install -g gulp
+  - npm install -g istanbul
+  - npm install -g mocha
 
 script:
   - gulp
 
 after_script:
-  - cat dist/coverage/lcov.info | codeclimate
+  - istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage
